@@ -24,6 +24,11 @@
       "id": 5,
       "name": "Martin Luther King",
       "number": "91-4568923"
+    },
+    {
+      "id": 6,
+      "name": "Adam White",
+      "number": "351-458962"
     }
   ]
 }
