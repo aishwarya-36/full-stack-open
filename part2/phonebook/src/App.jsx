@@ -46,7 +46,14 @@ const App = () => {
     };
     if (persons.filter((person) => person.name === newName).length != 0) {
       alert(`${newName} is already added to the phonebook`);
-    } else setPersons(persons.concat(personObject));
+    } else {
+      axios
+        .post("http://localhost:3001/persons", personObject)
+        .then((response) => {
+          setPersons(persons.concat(response.data));
+        });
+    }
+
     setNewName("");
     setNewNumber("");
   };
