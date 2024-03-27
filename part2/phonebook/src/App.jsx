@@ -1,4 +1,7 @@
 import { useState } from "react";
+import Persons from "./Persons";
+import PersonForm from "./PersonForm";
+import Filter from "./Filter";
 
 const App = () => {
   const personsInit = [
@@ -36,42 +39,30 @@ const App = () => {
 
     const personObject = {
       name: newName,
+      number: newNumber,
+      id: persons.length + 1,
     };
     if (persons.filter((person) => person.name === newName).length != 0) {
       alert(`${newName} is already added to the phonebook`);
     } else setPersons(persons.concat(personObject));
     setNewName("");
+    setNewNumber("");
   };
 
   return (
     <div>
       <h2>Phonebook</h2>
-      <div>
-        filter shown with
-        <input value={searchQuery} onChange={handleSearch} />
-      </div>
+      <Filter searchQuery={searchQuery} handleSearch={handleSearch} />
       <h3>Add a new</h3>
-      <form onSubmit={handleSubmit}>
-        <div>
-          name: <input value={newName} onChange={handleNewName} />
-        </div>
-        <div>
-          number: <input value={newNumber} onChange={handleNewNumber} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <PersonForm
+        handleSubmit={handleSubmit}
+        newName={newName}
+        handleNewName={handleNewName}
+        newNumber={newNumber}
+        handleNewNumber={handleNewNumber}
+      />
       <h3>Numbers</h3>
-      <ul>
-        {persons.map((person) => {
-          return (
-            <li key={person.id}>
-              {person.name} {person.number}
-            </li>
-          );
-        })}
-      </ul>
+      <Persons persons={persons} />
     </div>
   );
 };
