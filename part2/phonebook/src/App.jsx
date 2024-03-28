@@ -4,11 +4,20 @@ import PersonForm from "./PersonForm";
 import Filter from "./Filter";
 import personService from "./services/persons";
 
+const Notification = ({ message }) => {
+  if (message === null) {
+    return null;
+  }
+
+  return <div className="notification">{message}</div>;
+};
+
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [message, setMessage] = useState(null);
 
   useEffect(() => {
     personService.fetch().then((response) => {
@@ -71,11 +80,19 @@ const App = () => {
                   person.id !== existingPerson.id ? person : response.data
                 )
               );
+              setMessage(`Updated ${response.data.name}`);
+              setTimeout(() => {
+                setMessage(null);
+              }, 2000);
             })
         : null;
     } else {
       personService.add(personObject).then((response) => {
         setPersons(persons.concat(response.data));
+        setMessage(`Added ${response.data.name}`);
+        setTimeout(() => {
+          setMessage(null);
+        }, 2000);
       });
     }
 
@@ -99,6 +116,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message} />
       <Filter searchQuery={searchQuery} handleSearch={handleSearch} />
       <h3>Add a new</h3>
       <PersonForm
