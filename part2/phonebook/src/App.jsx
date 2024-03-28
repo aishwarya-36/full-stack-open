@@ -4,12 +4,11 @@ import PersonForm from "./PersonForm";
 import Filter from "./Filter";
 import personService from "./services/persons";
 
-const Notification = ({ message }) => {
+const Notification = ({ message, type }) => {
   if (message === null) {
     return null;
   }
-
-  return <div className="notification">{message}</div>;
+  return <div className={`${type}`}>{message}</div>;
 };
 
 const App = () => {
@@ -18,6 +17,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [message, setMessage] = useState(null);
+  const [messageType, setMessageType] = useState("error");
 
   useEffect(() => {
     personService.fetch().then((response) => {
@@ -80,15 +80,26 @@ const App = () => {
                   person.id !== existingPerson.id ? person : response.data
                 )
               );
+              setMessageType("success");
               setMessage(`Updated ${response.data.name}`);
               setTimeout(() => {
                 setMessage(null);
-              }, 2000);
+              }, 5000);
+            })
+            .catch(() => {
+              setMessageType("error");
+              setMessage(
+                `Information of ${existingPerson.name} has already been removed from server`
+              );
+              setTimeout(() => {
+                setMessage(null);
+              }, 5000);
             })
         : null;
     } else {
       personService.add(personObject).then((response) => {
         setPersons(persons.concat(response.data));
+        setMessageType("success");
         setMessage(`Added ${response.data.name}`);
         setTimeout(() => {
           setMessage(null);
@@ -116,7 +127,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={message} />
+      <Notification message={message} type={messageType} />
       <Filter searchQuery={searchQuery} handleSearch={handleSearch} />
       <h3>Add a new</h3>
       <PersonForm
