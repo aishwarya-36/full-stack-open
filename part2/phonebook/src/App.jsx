@@ -42,8 +42,37 @@ const App = () => {
       number: newNumber,
       id: (persons.length + 1).toString(),
     };
-    if (persons.filter((person) => person.name === newName).length != 0) {
-      alert(`${newName} is already added to the phonebook`);
+
+    // Alert if the name and number already matches the on in the phonebook.
+    if (
+      persons.filter(
+        (person) => person.name === newName && person.number === newNumber
+      ).length != 0
+    ) {
+      window.alert(`${newName} is already added to phonebook`);
+
+      // If the number is different, then confirm if the user wants to update
+    } else if (
+      persons.filter((person) => person.name === newName).length != 0
+    ) {
+      // Filter returns the object in an array, so the indexing is used to assign the object to the variable.
+      const existingPerson = persons.filter(
+        (person) => person.name === newName
+      )[0];
+
+      window.confirm(
+        `${newName} is already added to the phonebook, replace the old number with the new one?`
+      )
+        ? personService
+            .update(existingPerson.id, personObject)
+            .then((response) => {
+              setPersons(
+                persons.map((person) =>
+                  person.id !== existingPerson.id ? person : response.data
+                )
+              );
+            })
+        : null;
     } else {
       personService.add(personObject).then((response) => {
         setPersons(persons.concat(response.data));
