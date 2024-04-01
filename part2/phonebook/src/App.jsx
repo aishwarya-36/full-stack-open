@@ -21,9 +21,12 @@ const App = () => {
 
   useEffect(() => {
     personService.fetch().then((response) => {
-      setPersons(response.data);
+      const filteredPersons = response.data.filter((person) =>
+        person.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setPersons(filteredPersons);
     });
-  }, []);
+  }, [searchQuery]);
 
   const handleNewName = (e) => {
     setNewName(e.target.value);
@@ -31,16 +34,6 @@ const App = () => {
 
   const handleNewNumber = (e) => {
     setNewNumber(e.target.value);
-  };
-
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
-    if (searchQuery != "") {
-      const filteredPersons = persons.filter((person) =>
-        person.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setPersons(filteredPersons);
-    }
   };
 
   const handleSubmit = (e) => {
@@ -128,7 +121,10 @@ const App = () => {
     <div>
       <h2>Phonebook</h2>
       <Notification message={message} type={messageType} />
-      <Filter searchQuery={searchQuery} handleSearch={handleSearch} />
+      <Filter
+        searchQuery={searchQuery}
+        handleSearch={(e) => setSearchQuery(e.target.value)}
+      />
       <h3>Add a new</h3>
       <PersonForm
         handleSubmit={handleSubmit}
