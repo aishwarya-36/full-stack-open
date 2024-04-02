@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import Country from "./Country";
 
 const Notification = ({ message }) => {
   if (message === null) {
@@ -20,6 +21,7 @@ const App = () => {
         const countriesList = response.data.filter((country) =>
           country.name.common.toLowerCase().includes(searchQuery.toLowerCase())
         );
+
         if (searchQuery.length > 0) {
           if (countriesList.length > 10) {
             setMessage("Too many matches,specify another filter");
@@ -35,48 +37,19 @@ const App = () => {
 
   return (
     <div>
-      Find countries{" "}
+      Find countries
       <input
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
       />
       <Notification message={message} />
-      <div>
-        {countries.length === 1 ? (
-          <div>
-            <h2> {countries[0].name.common}</h2>
-            <p>
-              Capital(s):{" "}
-              {countries[0].capital.map((item, index) => (
-                <span key={item}>
-                  {item}
-                  {index !== countries[0].capital.length - 1 ? ", " : ""}
-                </span>
-              ))}
-            </p>
-            <p>Area: {countries[0].area}</p>
-            <h3>Languages:</h3>
-            <ul>
-              {Object.keys(countries[0].languages).map((lang) => (
-                <li key={lang}>{countries[0].languages[lang]}</li>
-              ))}
-            </ul>
-            <h3>Flag: </h3>
-            <img
-              src={countries[0].flags.png}
-              alt="flag"
-              height="200"
-              width="250"
-            />
-          </div>
-        ) : (
-          <ol>
-            {countries?.map((country) => (
-              <li key={country.cca2}> {country.name.common}</li>
-            ))}
-          </ol>
-        )}
-      </div>
+      <ol>
+        {countries?.map((country, i) => (
+          <li key={i}>
+            <Country key={i} country={country} />
+          </li>
+        ))}
+      </ol>
     </div>
   );
 };
