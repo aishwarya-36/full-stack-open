@@ -24,11 +24,6 @@ let data = [
     name: "Mary Poppendieck",
     number: "39-23-6423122",
   },
-  {
-    id: 5,
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-  },
 ];
 
 app.get("/api/persons", (request, response) => {
@@ -60,6 +55,18 @@ app.delete("/api/persons/:id", (request, response) => {
 
 app.post("/api/persons", (request, response) => {
   const body = request.body;
+
+  if (!body.name || !body.number) {
+    return response.status(400).json({
+      error: "Name / Number is missing",
+    });
+  }
+
+  if (data.filter((person) => person.name === body.name).length > 0) {
+    return response.status(400).json({
+      error: "Name must be unique",
+    });
+  }
   const person = {
     id: Math.floor(Math.random() * 5000),
     name: body.name,
