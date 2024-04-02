@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Weather from "./Weather";
 
 const Country = ({ country }) => {
   const [show, setShow] = useState();
@@ -35,7 +36,14 @@ const Country = ({ country }) => {
             ))}
           </ul>
           <h5>Flag: </h5>
-          <img src={country.flags.png} alt="flag" height="200" width="250" />
+          <img
+            src={country.flags.png}
+            alt="flag"
+            border="1"
+            height="120"
+            width="180"
+          />
+          <Weather country={country} />
         </div>
       ) : (
         ""
