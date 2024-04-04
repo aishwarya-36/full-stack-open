@@ -1,7 +1,9 @@
 const express = require("express");
 const app = express();
 const morgan = require("morgan");
+const cors = require("cors");
 
+app.use(cors());
 app.use(express.json());
 
 morgan.token("request-body", function (request, response) {
@@ -14,7 +16,7 @@ app.use(
   )
 );
 
-let data = [
+let persons = [
   {
     id: 1,
     name: "Arto Hellas",
@@ -38,18 +40,18 @@ let data = [
 ];
 
 app.get("/api/persons", (request, response) => {
-  response.json(data);
+  response.json(persons);
 });
 
 app.get("/info", (request, response) => {
   response.send(
-    `<p>Phonebook has info for ${data.length} people </p> ${new Date()}`
+    `<p>Phonebook has info for ${persons.length} people </p> ${new Date()}`
   );
 });
 
 app.get("/api/persons/:id", (request, response) => {
   const id = Number(request.params.id);
-  const person = data.find((person) => person.id === id);
+  const person = persons.find((person) => person.id === id);
 
   if (person) {
     response.json(person);
@@ -60,7 +62,7 @@ app.get("/api/persons/:id", (request, response) => {
 
 app.delete("/api/persons/:id", (request, response) => {
   const id = Number(request.params.id);
-  data = data.filter((person) => person.id !== id);
+  persons = persons.filter((person) => person.id !== id);
   response.status(204).end();
 });
 
@@ -72,7 +74,7 @@ app.post("/api/persons", (request, response) => {
     });
   }
 
-  if (data.filter((person) => person.name === body.name).length > 0) {
+  if (persons.filter((person) => person.name === body.name).length > 0) {
     return response.status(400).json({
       error: "Name must be unique",
     });
@@ -83,11 +85,11 @@ app.post("/api/persons", (request, response) => {
     number: body.number,
   };
 
-  data = data.concat(person);
+  persons = persons.concat(person);
   response.json(person);
 });
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
