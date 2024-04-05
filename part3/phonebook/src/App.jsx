@@ -40,6 +40,19 @@ const App = () => {
     setNewNumber("");
   };
 
+  const handleDelete = (id) => {
+    const delPerson = persons.find((n) => n.id === id);
+    window.confirm(`Delete ${delPerson.name} ?`)
+      ? personService
+          .del(id)
+          .then((response) =>
+            setPersons(
+              persons.filter((persons) => persons.id !== response.data.id)
+            )
+          )
+      : null;
+  };
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -56,7 +69,7 @@ const App = () => {
         handleNewNumber={handleNewNumber}
       />
       <h3>Numbers</h3>
-      <Persons persons={persons} />
+      <Persons persons={persons} handleDelete={handleDelete} />
     </div>
   );
 };
