@@ -12,31 +12,37 @@ const url = `mongodb+srv://raishwarya36:${password}@fso-cluster.3mj12f1.mongodb.
 
 mongoose.set("strictQuery", false);
 
-mongoose.connect(url);
+mongoose.connect(url).then(() => {
+  const personSchema = new mongoose.Schema({
+    name: String,
+    number: String,
+  });
 
-const personSchema = new mongoose.Schema({
-  name: String,
-  number: String,
-});
+  const Person = mongoose.model("Person", personSchema);
 
-const Person = mongoose.model("Person", personSchema);
+  if (process.argv.length === 3) {
+    Person.find({}).then((result) => {
+      `${console.log("phonebook: ")}` +
+        result.forEach((person) => {
+          console.log(person.name + " " + person.number);
+        });
+      mongoose.connection.close();
+    });
+  } else {
+    const person = new Person({
+      name: process.argv[3],
+      number: process.argv[4],
+    });
 
-if (process.argv.length === 3) {
+    person.save().then((result) => {
+      console.log(`Added ${result.name} number ${result.number} to phonebook`);
+      mongoose.connection.close();
+    });
+  }
   Person.find({}).then((result) => {
-    `${console.log("phonebook: ")}` +
-      result.forEach((person) => {
-        console.log(person.name + " " + person.number);
-      });
+    result.forEach((person) => {
+      console.log(person);
+    });
     mongoose.connection.close();
   });
-} else {
-  const person = new Person({
-    name: process.argv[3],
-    number: process.argv[4],
-  });
-
-  person.save().then((result) => {
-    console.log(`Added ${result.name} number ${result.number} to phonebook`);
-    mongoose.connection.close();
-  });
-}
+});

@@ -32,11 +32,10 @@ const App = () => {
     const personObject = {
       name: newName,
       number: newNumber,
-      id: persons.length + 1,
     };
     if (persons.filter((person) => person.name === newName).length != 0) {
       alert(`${newName} is already added to the phonebook`);
-    } else setPersons(persons.concat(personObject));
+    } else personService.add(personObject);
     setNewName("");
     setNewNumber("");
   };
