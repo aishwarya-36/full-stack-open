@@ -4,11 +4,20 @@ import PersonForm from "./PersonForm";
 import Filter from "./Filter";
 import personService from "./services/persons";
 
+const Notification = ({ message, type }) => {
+  if (message === null) {
+    return null;
+  }
+  return <div className={`${type}`}>{message}</div>;
+};
+
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [message, setMessage] = useState(null);
+  const [messageType, setMessageType] = useState("error");
 
   useEffect(() => {
     personService.fetch().then((response) => {
@@ -18,6 +27,7 @@ const App = () => {
       setPersons(filteredPersons);
     });
   }, [searchQuery]);
+
   const handleNewName = (e) => {
     setNewName(e.target.value);
   };
@@ -33,6 +43,7 @@ const App = () => {
       name: newName,
       number: newNumber,
     };
+
     // Alert if the name and number already matches the on in the phonebook.
     if (
       persons.filter(
@@ -61,9 +72,42 @@ const App = () => {
                   person.id !== existingPerson.id ? person : response.data
                 )
               );
+              setMessageType("success");
+              setMessage(`Updated ${response.data.name}`);
+              setTimeout(() => {
+                setMessage(null);
+              }, 5000);
+            })
+            .catch(() => {
+              setMessageType("error");
+              setMessage(
+                `Information of ${existingPerson.name} has already been removed from server`
+              );
+              setTimeout(() => {
+                setMessage(null);
+              }, 5000);
             })
         : null;
-    } else personService.add(personObject);
+    } else {
+      personService
+        .add(personObject)
+        .then((response) => {
+          setPersons(persons.concat(response.data));
+          setMessageType("success");
+          setMessage(`Added ${response.data.name}`);
+          setTimeout(() => {
+            setMessage(null);
+          }, 2000);
+        })
+        .catch((error) => {
+          setMessageType("error");
+          setMessage(`${error.response.data.error}`);
+          setTimeout(() => {
+            setMessage(null);
+          }, 5000);
+        });
+    }
+
     setNewName("");
     setNewNumber("");
   };
@@ -84,6 +128,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message} type={messageType} />
       <Filter
         searchQuery={searchQuery}
         handleSearch={(e) => setSearchQuery(e.target.value)}
