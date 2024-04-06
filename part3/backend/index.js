@@ -36,7 +36,7 @@ const errorHandler = (error, request, response, next) => {
   next(error);
 };
 
-morgan.token("request-body", function (request, response) {
+morgan.token("request-body", function (request, ) {
   return JSON.stringify(request.body);
 });
 
@@ -95,7 +95,7 @@ app.get("/info", (request, response) => {
 
 app.delete("/api/persons/:id", (request, response, next) => {
   Person.findByIdAndDelete(request.params.id)
-    .then((result) => {
+    .then(() => {
       response.status(204).end();
     })
     .catch((error) => next(error));
