@@ -10,7 +10,18 @@ const totalLikes = (blogs) => {
   }
 };
 
+const favoriteBlog = (blogs) => {
+  if (blogs.length === 0) {
+    return {};
+  } else {
+    return blogs.reduce(function (prev, current) {
+      return prev && prev.likes > current.likes ? prev : current;
+    });
+  }
+};
+
 module.exports = {
   dummy,
   totalLikes,
+  favoriteBlog,
 };
