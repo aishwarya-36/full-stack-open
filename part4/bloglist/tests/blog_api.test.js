@@ -49,6 +49,26 @@ describe("API", () => {
     assert.strictEqual(idCount, helper.initialBlogs.length);
   });
 
+  test("a valid blog is added", async () => {
+    const newBlog = {
+      title: "Go To Statement Considered Harmful",
+      author: "Edsger W. Dijkstra",
+      url: "https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf",
+      likes: 5,
+    };
+    await api
+      .post("/api/blogs")
+      .send(newBlog)
+      .expect(201)
+      .expect("Content-Type", /application\/json/);
+
+    const getBlogs = await helper.blogsInDb();
+    assert.strictEqual(getBlogs.length, helper.initialBlogs.length + 1);
+
+    const titles = getBlogs.map((b) => b.title);
+    assert(titles.includes("Go To Statement Considered Harmful"));
+  });
+
   after(async () => {
     await mongoose.connection.close();
   });
