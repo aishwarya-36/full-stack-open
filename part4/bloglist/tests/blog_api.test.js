@@ -69,6 +69,23 @@ describe("API", () => {
     assert(titles.includes("Go To Statement Considered Harmful"));
   });
 
+  test("a blog without likes property defaults to value 0", async () => {
+    const newBlog = {
+      title: "Go To Statement Considered Harmful",
+      author: "Edsger W. Dijkstra",
+      url: "https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf",
+    };
+    await api
+      .post("/api/blogs")
+      .send(newBlog)
+      .expect(201)
+      .expect("Content-Type", /application\/json/);
+
+    //Check if likes with default 0 value has been added
+    const getBlogs = await helper.blogsInDb();
+    assert.strictEqual(getBlogs[getBlogs.length - 1].likes, 0);
+  });
+
   after(async () => {
     await mongoose.connection.close();
   });
