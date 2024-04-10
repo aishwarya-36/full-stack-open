@@ -15,7 +15,7 @@ beforeEach(async () => {
   await Promise.all(blogPromises);
 });
 
-describe("API", () => {
+describe("API: When there is initially some blogs saved", () => {
   test("correct amount of blogs are returned as json", async () => {
     await api
       .get("/api/blogs")
@@ -48,8 +48,10 @@ describe("API", () => {
     assert.strictEqual(_idCount, 0);
     assert.strictEqual(idCount, helper.initialBlogs.length);
   });
+});
 
-  test("a valid blog is added", async () => {
+describe("API: When a new blog is added", () => {
+  test("succeeds with valid data", async () => {
     const newBlog = {
       title: "Go To Statement Considered Harmful",
       author: "Edsger W. Dijkstra",
@@ -101,8 +103,23 @@ describe("API", () => {
     };
     await api.post("/api/blogs").send(newBlog2).expect(400);
   });
+});
 
-  after(async () => {
-    await mongoose.connection.close();
+describe("API: deletion of a blog", () => {
+  test("succeeds with status code 204 if id is valid", async () => {
+    const blogsAtStart = await helper.blogsInDb();
+    const blogToDelete = blogsAtStart[0];
+    await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+
+    const blogsAtEnd = await helper.blogsInDb();
+
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1);
+
+    const titles = blogsAtEnd.map((b) => b.title);
+    assert(!titles.includes(blogToDelete.title));
   });
+});
+
+after(async () => {
+  await mongoose.connection.close();
 });
