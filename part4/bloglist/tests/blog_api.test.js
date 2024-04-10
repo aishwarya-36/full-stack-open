@@ -120,6 +120,24 @@ describe("API: deletion of a blog", () => {
   });
 });
 
+describe("API: updating of a blog", () => {
+  test("succeeds with status code 200 if id is valid", async () => {
+    const blogsAtStart = await helper.blogsInDb();
+    const blogToUpdate = blogsAtStart[0];
+    blogToUpdate.likes = blogToUpdate.likes + 5;
+
+    const newLikes = blogToUpdate.likes;
+
+    await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send(blogToUpdate)
+      .expect(200);
+    const blogsAtEnd = await helper.blogsInDb();
+
+    assert.strictEqual(blogsAtEnd[0].likes, newLikes);
+  });
+});
+
 after(async () => {
   await mongoose.connection.close();
 });
