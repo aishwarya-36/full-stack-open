@@ -86,6 +86,22 @@ describe("API", () => {
     assert.strictEqual(getBlogs[getBlogs.length - 1].likes, 0);
   });
 
+  test("a blog without Title/URL sends a 400 Bad Request", async () => {
+    const newBlog1 = {
+      author: "Edsger W. Dijkstra",
+      url: "https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf",
+      likes: 5,
+    };
+    await api.post("/api/blogs").send(newBlog1).expect(400);
+
+    const newBlog2 = {
+      author: "Edsger W. Dijkstra",
+      title: "Go To Statement Considered Harmful",
+      likes: 5,
+    };
+    await api.post("/api/blogs").send(newBlog2).expect(400);
+  });
+
   after(async () => {
     await mongoose.connection.close();
   });

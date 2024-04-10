@@ -10,8 +10,12 @@ blogsRouter.post("/", async (request, response, next) => {
   const blog = new Blog(request.body);
   try {
     blog.likes = blog?.likes || 0;
-    const savedBlog = await blog.save();
-    response.status(201).json(savedBlog);
+    if (blog.title === undefined || blog.url === undefined)
+      response.status(400).send({ error: "Title/URL is missing" });
+    else {
+      const savedBlog = await blog.save();
+      response.status(201).json(savedBlog);
+    }
   } catch (exception) {
     next(exception);
   }
