@@ -6,41 +6,40 @@ blogsRouter.get("/", async (request, response) => {
   response.json(blogs);
 });
 
-blogsRouter.post("/", async (request, response, next) => {
+blogsRouter.post("/", async (request, response) => {
   const blog = new Blog(request.body);
-  try {
-    blog.likes = blog?.likes || 0;
-    if (blog.title === undefined || blog.url === undefined)
-      response.status(400).send({ error: "Title/URL is missing" });
-    else {
-      const savedBlog = await blog.save();
-      response.status(201).json(savedBlog);
-    }
-  } catch (exception) {
-    next(exception);
+
+  blog.likes = blog?.likes || 0;
+  if (blog.title === undefined || blog.url === undefined)
+    response.status(400).send({ error: "Title/URL is missing" });
+  else {
+    const savedBlog = await blog.save();
+    response.status(201).json(savedBlog);
   }
 });
 
-blogsRouter.delete("/:id", async (request, response, next) => {
-  try {
-    await Blog.findByIdAndDelete(request.params.id);
-    response.status(204).end();
-  } catch (expression) {
-    next(expression);
+blogsRouter.get("/:id", async (request, response) => {
+  const blog = await Blog.findById(request.params.id);
+  if (blog) {
+    response.json(blog);
+  } else {
+    response.status(404).end();
   }
 });
 
-blogsRouter.put("/:id", async (request, response, next) => {
+blogsRouter.delete("/:id", async (request, response) => {
+  await Blog.findByIdAndDelete(request.params.id);
+  response.status(204).end();
+});
+
+blogsRouter.put("/:id", async (request, response) => {
   const blog = {
     ...request.body,
     likes: request.body.likes,
   };
-  try {
-    await Blog.findByIdAndUpdate(request.params.id, blog, { new: true });
-    response.json(blog);
-  } catch (expression) {
-    next(expression);
-  }
+
+  await Blog.findByIdAndUpdate(request.params.id, blog, { new: true });
+  response.json(blog);
 });
 
 module.exports = blogsRouter;
