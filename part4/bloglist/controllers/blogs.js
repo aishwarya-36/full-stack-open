@@ -18,7 +18,9 @@ blogsRouter.post("/", middleware.userExtractor, async (request, response) => {
     ...body,
     user: user.id,
   });
-
+  if (!request.user) {
+    return response.status(401).json({ error: "token missing or invalid" });
+  }
   blog.likes = blog?.likes || 0;
   if (blog.title === undefined || blog.url === undefined)
     response.status(400).send({ error: "Title/URL is missing" });
@@ -41,6 +43,9 @@ blogsRouter.get("/:id", async (request, response) => {
 
 blogsRouter.delete("/:id", async (request, response) => {
   const blog = await Blog.findById(request.params.id);
+  if (!request.token) {
+    return response.status(401).json({ error: "token missing or invalid" });
+  }
   if (!blog)
     response.status(404).json({ error: "Invalid Blog Id/Blog does not exist" });
   if (blog.user.toString() === request.user.id) {

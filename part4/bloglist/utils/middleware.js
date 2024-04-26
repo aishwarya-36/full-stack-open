@@ -33,7 +33,7 @@ const errorHandler = (error, request, response, next) => {
 };
 
 const tokenExtractor = (request, response, next) => {
-  const authorization = request.get("authorization");
+  const authorization = request.get("Authorization");
   if (authorization && authorization.toLowerCase().startsWith("bearer ")) {
     request.token = authorization.replace("Bearer ", "");
     return next();
@@ -44,6 +44,9 @@ const tokenExtractor = (request, response, next) => {
 };
 
 const userExtractor = async (request, response, next) => {
+  if (request.method !== "POST") {
+    return next();
+  }
   const decodedToken = jwt.verify(request.token, process.env.SECRET);
 
   if (!decodedToken.id) {

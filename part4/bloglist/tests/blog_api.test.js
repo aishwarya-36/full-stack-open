@@ -17,7 +17,6 @@ describe("API: When there is initially some blogs saved", () => {
     const blogObjects = helper.initialBlogs.map((blog) => new Blog(blog));
     const blogPromises = blogObjects.map((blog) => blog.save());
     await Promise.all(blogPromises);
-    await Blog.insertMany(helper.initialBlogs);
   });
   test("correct amount of blogs are returned as json", async () => {
     await api
@@ -54,7 +53,27 @@ describe("API: When there is initially some blogs saved", () => {
 });
 
 describe("API: When a new blog is added", () => {
+  beforeEach(async () => {
+    await User.deleteMany({});
+
+    const passwordHash = await bcrypt.hash("sekret", 10);
+    const user = new User({
+      username: "MadMax",
+      name: "Matti",
+      blogs: [],
+      passwordHash,
+    });
+
+    await user.save();
+  }, 100000);
+
   test("succeeds with valid data", async () => {
+    const user = {
+      username: "MadMax",
+      password: "sekret",
+    };
+
+    const loginUser = await api.post("/api/login").send(user);
     const newBlog = {
       title: "Go To Statement Considered Harmful",
       author: "Edsger W. Dijkstra",
@@ -64,6 +83,7 @@ describe("API: When a new blog is added", () => {
     await api
       .post("/api/blogs")
       .send(newBlog)
+      .set({ Authorization: `Bearer ${loginUser.body.token}` })
       .expect(201)
       .expect("Content-Type", /application\/json/);
 
@@ -74,7 +94,36 @@ describe("API: When a new blog is added", () => {
     assert(titles.includes("Go To Statement Considered Harmful"));
   });
 
+  test("Fails if a token is not provided", async () => {
+    const user = {
+      username: "MadMax",
+      password: "sekret",
+    };
+    const newBlog = {
+      title: "Latest: Go To Statement Considered Harmful",
+      author: "Edsger W. Dijkstra",
+      url: "https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf",
+      likes: 5,
+    };
+
+    await api.post("/api/login").send(user);
+
+    await api
+      .post("/api/blogs")
+      .send(newBlog)
+      .set({ Authorization: "Bearer " })
+      .expect(401)
+      .expect("Content-Type", /application\/json/);
+  });
+
   test("a blog without likes property defaults to value 0", async () => {
+    const user = {
+      username: "MadMax",
+      password: "sekret",
+    };
+
+    const loginUser = await api.post("/api/login").send(user);
+
     const newBlog = {
       title: "Go To Statement Considered Harmful",
       author: "Edsger W. Dijkstra",
@@ -83,6 +132,7 @@ describe("API: When a new blog is added", () => {
     await api
       .post("/api/blogs")
       .send(newBlog)
+      .set({ Authorization: `Bearer ${loginUser.body.token}` })
       .expect(201)
       .expect("Content-Type", /application\/json/);
 
@@ -92,31 +142,71 @@ describe("API: When a new blog is added", () => {
   });
 
   test("a blog without Title/URL sends a 400 Bad Request", async () => {
+    const user = {
+      username: "MadMax",
+      password: "sekret",
+    };
+
+    const loginUser = await api.post("/api/login").send(user);
+
     const newBlog1 = {
       author: "Edsger W. Dijkstra",
       url: "https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf",
       likes: 5,
     };
-    await api.post("/api/blogs").send(newBlog1).expect(400);
+    await api
+      .post("/api/blogs")
+      .send(newBlog1)
+      .set({ Authorization: `Bearer ${loginUser.body.token}` })
+      .expect(400);
 
     const newBlog2 = {
       author: "Edsger W. Dijkstra",
       title: "Go To Statement Considered Harmful",
       likes: 5,
     };
-    await api.post("/api/blogs").send(newBlog2).expect(400);
+    await api
+      .post("/api/blogs")
+      .send(newBlog2)
+      .set({ Authorization: `Bearer ${loginUser.body.token}` })
+      .expect(400);
   });
 });
 
 describe("API: deletion of a blog", () => {
+  beforeEach(async () => {
+    await User.deleteMany({});
+
+    const passwordHash = await bcrypt.hash("sekret", 10);
+    const user = new User({
+      username: "MadMax",
+      name: "Matti",
+      blogs: [],
+      passwordHash,
+    });
+
+    await user.save();
+  }, 100000);
+
   test("succeeds with status code 204 if id is valid", async () => {
+    const user = {
+      username: "MadMax",
+      password: "sekret",
+    };
+
+    const loginUser = await api.post("/api/login").send(user);
+
     const blogsAtStart = await helper.blogsInDb();
     const blogToDelete = blogsAtStart[0];
-    await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .set({ Authorization: `Bearer ${loginUser.body.token}` })
+      .expect(204);
 
     const blogsAtEnd = await helper.blogsInDb();
 
-    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1);
+    assert.strictEqual(blogsAtEnd.length, blogsAtStart.length - 1);
 
     const titles = blogsAtEnd.map((b) => b.title);
     assert(!titles.includes(blogToDelete.title));
@@ -141,7 +231,7 @@ describe("API: updating of a blog", () => {
   });
 });
 
-describe.only("when there is initially one user in db", () => {
+describe("when there is initially one user in db", () => {
   beforeEach(async () => {
     await User.deleteMany({});
 
@@ -151,7 +241,7 @@ describe.only("when there is initially one user in db", () => {
     await user.save();
   });
 
-  test.only("creation succeeds with a fresh username", async () => {
+  test("creation succeeds with a fresh username", async () => {
     const usersAtStart = await helper.usersInDb();
 
     const newUser = {
@@ -173,7 +263,7 @@ describe.only("when there is initially one user in db", () => {
     assert(usernames.includes(newUser.username));
   });
 
-  test.only("creation fails with proper statuscode and message if username already taken", async () => {
+  test("creation fails with proper statuscode and message if username already taken", async () => {
     const usersAtStart = await helper.usersInDb();
 
     const newUser = {
