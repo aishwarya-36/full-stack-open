@@ -1,0 +1,15 @@
+Script started on 2025-02-12 20:41:54+00:00 [TERM="xterm-256color" TTY="/dev/pts/3" COLUMNS="117" LINES="57"]
+]0;aishu@new-host:~/Desktop/FSO/Submissions/full-stack-open/part12[?2004h[32maishu@new-host[0m:[32m~/Desktop/FSO/Submissions/full-stack-open/part12[0m$[0m docker run -it ubuntu bash
+[?2004l
+[?2004h]0;root@5fb855f1447c: /root@5fb855f1447c:/# mkdir /usr/src/app
+[?2004l
+[?2004h]0;root@5fb855f1447c: /root@5fb855f1447c:/# touch /usr/src/app/index.js
+[?2004l
+[?2004h]0;root@5fb855f1447c: /root@5fb855f1447c:/# [Kexit
+[?2004l
+exit
+]0;aishu@new-host:~/Desktop/FSO/Submissions/full-stack-open/part12[?2004h[32maishu@new-host[0m:[32m~/Desktop/FSO/Submissions/full-stack-open/part12[0m$[0m exit
+[?2004l
+exit
+
+Script done on 2025-02-12 20:43:09+00:00 [COMMAND_EXIT_CODE="0"]
