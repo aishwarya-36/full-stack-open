@@ -1,9 +1,0 @@
-Script started on 2025-02-12 20:40:16+00:00 [TERM="xterm-256color" TTY="/dev/pts/3" COLUMNS="117" LINES="57"]
-]0;aishu@new-host:~/Desktop/FSO/Submissions/full-stack-open/part12[?2004h[32maishu@new-host[0m:[32m~/Desktop/FSO/Submissions/full-stack-open/part12[0m$[0m echo "hello"
-[?2004l
-hello
-]0;aishu@new-host:~/Desktop/FSO/Submissions/full-stack-open/part12[?2004h[32maishu@new-host[0m:[32m~/Desktop/FSO/Submissions/full-stack-open/part12[0m$[0m exit
-[?2004l
-exit
-
-Script done on 2025-02-12 20:40:52+00:00 [COMMAND_EXIT_CODE="0"]
